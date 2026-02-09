@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Fit Test Arq v7.0 - Pantone Palette</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0f172a",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#020617",
+                        "sage-green": {
+                            DEFAULT: "#8da399",
+                            dark: "#7a8f85"
+                        },
+                        "muted-coral": {
+                            DEFAULT: "#bc7c7c",
+                            dark: "#a66b6b"
+                        }
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .canvas-grid {
+            background-size: 40px 40px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+        .dark .canvas-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+        }
+        canvas {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex overflow-hidden">
+    <aside id="sidebar"
+        class="w-80 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col h-screen z-20 shadow-xl">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+            <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-lg">architecture</span>
+            </div>
+            <h1 class="font-bold text-xl tracking-tight">FIT TEST <span class="text-blue-500">7.0</span></h1>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            <section class="group">
+                <div class="flex items-center gap-2 mb-4">
+                    <span
+                        class="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">01</span>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Terreno Base</h2>
+                </div>
+                <div class="space-y-3">
+                    <label class="block">
+                        <span class="sr-only">Seleccionar archivo</span>
+                        <input id="upload" accept="image/*"
+                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 dark:file:bg-slate-800 dark:file:text-slate-300 cursor-pointer"
+                            type="file" />
+                    </label>
+                    <button onclick="startCalibration()"
+                        class="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white rounded transition-colors text-sm font-medium">
+                        <span class="material-symbols-outlined text-sm">straighten</span>
+                        CALIBRAR ESCALA
+                    </button>
+                    <p id="scale-lbl" class="text-[11px] text-slate-400 dark:text-slate-500 font-mono text-center">1 px
+                        =
+                        1 m (Sin calibrar)</p>
+                </div>
+            </section>
+            <section class="group">
+                <div class="flex items-center gap-2 mb-4">
+                    <span
+                        class="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">02</span>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Agregar Producto</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="relative z-50">
+                        <!-- Hidden native select for logic compatibility -->
+                        <select id="catalogSelect" onchange="loadPreset()" class="hidden">
+                            <option value="custom" data-icon="tune">-- Medida Personalizada --</option>
+                            <optgroup label="Estacionamientos">
+                                <option value="parking_std" data-icon="directions_car">Cajón Estándar (2.50 x 5.00)
+                                </option>
+                                <option value="parking_compact" data-icon="directions_car">Cajón Compacto (2.10 x 4.50)
+                                </option>
+                            </optgroup>
+                            <optgroup label="Estudios">
+                                <option value="studio_a" data-icon="chair">Estudio A - 36m² (4.00 x 9.00)</option>
+                                <option value="studio_b" data-icon="chair">Estudio B - 36m² (5.00 x 7.20)</option>
+                            </optgroup>
+                            <optgroup label="1 Recámara">
+                                <option value="1bed_a" data-icon="single_bed">1 Rec A - 45m² (5.00 x 9.00)</option>
+                                <option value="1bed_b" data-icon="single_bed">1 Rec B - 47.5m² (6.60 x 7.20)</option>
+                            </optgroup>
+                            <optgroup label="2 Recámaras">
+                                <option value="2bed_a" data-icon="king_bed">2 Rec A - 64.8m² (7.20 x 9.00)</option>
+                                <option value="2bed_b" data-icon="king_bed">2 Rec B - 63.3m² (6.60 x 9.60)</option>
+                            </optgroup>
+                        </select>
+
+                        <!-- Custom Dropdown Trigger -->
+                        <button id="customSelectTrigger" onclick="toggleDropdown()"
+                            class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded text-sm focus:ring-blue-500 focus:border-blue-500 text-left flex items-center justify-between">
+                            <span id="selectedOptionText" class="truncate">-- Medida Personalizada --</span>
+                            <span class="material-symbols-outlined text-sm text-slate-400">expand_more</span>
+                        </button>
+                        <span id="selectedOptionIcon"
+                            class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-sm">tune</span>
+
+                        <!-- Custom Dropdown Options -->
+                        <div id="customOptions"
+                            class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-auto z-50">
+                            <!-- Options will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <script>
+                        const select = document.getElementById('catalogSelect');
+                        const trigger = document.getElementById('customSelectTrigger');
+                        const optionsContainer = document.getElementById('customOptions');
+                        const selectedText = document.getElementById('selectedOptionText');
+                        const selectedIcon = document.getElementById('selectedOptionIcon');
+
+                        function initCustomSelect() {
+                            optionsContainer.innerHTML = '';
+                            const groups = select.getElementsByTagName('optgroup');
+                            const singleOptions = select.querySelectorAll(':scope > option'); // Direct children options
+
+                            // Add single options first
+                            singleOptions.forEach(opt => {
+                                createOptionElement(opt);
+                            });
+
+                            // Add grouped options
+                            Array.from(groups).forEach(group => {
+                                const groupLabel = document.createElement('div');
+                                groupLabel.className = 'px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50 dark:bg-slate-900/50';
+                                groupLabel.textContent = group.label;
+                                optionsContainer.appendChild(groupLabel);
+
+                                Array.from(group.children).forEach(opt => {
+                                    createOptionElement(opt);
+                                });
+                            });
+                        }
+
+                        function createOptionElement(opt) {
+                            const div = document.createElement('div');
+                            div.className = 'px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer flex items-center gap-2';
+                            const iconName = opt.getAttribute('data-icon') || 'category';
+                            div.innerHTML = `<span class="material-symbols-outlined text-lg text-slate-400">${iconName}</span><span>${opt.text}</span>`;
+                            div.onclick = () => {
+                                selectOption(opt.value, opt.text, iconName);
+                            };
+                            optionsContainer.appendChild(div);
+                        }
+
+                        function toggleDropdown() {
+                            optionsContainer.classList.toggle('hidden');
+                        }
+
+                        function selectOption(value, text, icon) {
+                            select.value = value;
+                            selectedText.textContent = text;
+                            selectedIcon.textContent = icon;
+                            optionsContainer.classList.add('hidden');
+                            // Trigger native change event
+                            const event = new Event('change');
+                            select.dispatchEvent(event);
+                        }
+
+                        // Close on click outside
+                        document.addEventListener('click', (e) => {
+                            if (!trigger.contains(e.target) && !optionsContainer.contains(e.target)) {
+                                optionsContainer.classList.add('hidden');
+                            }
+                        });
+
+
+                        // Initialize on load
+                        initCustomSelect();
+                    </script>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="relative">
+                            <input id="nW" value="10"
+                                class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded text-sm font-mono"
+                                type="number" placeholder="Ancho" />
+                            <span class="absolute left-3 top-2.5 text-[10px] font-bold text-slate-400">W</span>
+                        </div>
+                        <div class="relative">
+                            <input id="nH" value="10"
+                                class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded text-sm font-mono"
+                                type="number" placeholder="Largo" />
+                            <span class="absolute left-3 top-2.5 text-[10px] font-bold text-slate-400">H</span>
+                        </div>
+                    </div>
+                    <input id="nLabel"
+                        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded text-sm"
+                        placeholder="Etiqueta (Ej: A-101)" type="text" />
+                    <input type="hidden" id="nColor" value="#938172">
+                    <button onclick="addBlock()"
+                        class="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white hover:opacity-90 rounded transition-opacity text-sm font-medium shadow-lg shadow-slate-200 dark:shadow-none">
+                        <span class="material-symbols-outlined text-sm">add_box</span>
+                        INSERTAR BLOQUE
+                    </button>
+                </div>
+            </section>
+
+            <section id="edit-panel"
+                class="group p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800"
+                style="display:none;">
+                <div class="flex items-center gap-2 mb-4">
+                    <span
+                        class="text-[10px] font-bold bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">03</span>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Editar Selección</h2>
+                </div>
+                <div class="space-y-3">
+                    <input id="eLabel" oninput="updateBlockData()"
+                        class="w-full px-3 py-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded text-sm"
+                        type="text" />
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="duplicateSelected()"
+                            class="flex items-center justify-center gap-1.5 py-2 bg-sage-green hover:bg-sage-green-dark text-white rounded text-xs font-medium transition-colors">
+                            <span class="material-symbols-outlined text-sm">content_copy</span>
+                            DUPLICAR
+                        </button>
+                        <button onclick="deleteSelected()"
+                            class="flex items-center justify-center gap-1.5 py-2 bg-muted-coral hover:bg-muted-coral-dark text-white rounded text-xs font-medium transition-colors">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                            ELIMINAR
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="p-6 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <button onclick="downloadImage()"
+                class="w-full flex items-center justify-center gap-2 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs font-bold uppercase tracking-tight transition-colors">
+                <span class="material-symbols-outlined text-lg">image</span>
+                Guardar Imagen PNG
+            </button>
+            <button onclick="clearAll()"
+                class="w-full flex items-center justify-center gap-2 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded text-xs font-bold uppercase tracking-tight transition-colors">
+                <span class="material-symbols-outlined text-lg">dangerous</span>
+                Borrar Todo
+            </button>
+        </div>
+    </aside>
+
+    <main id="main-area" class="flex-1 relative overflow-hidden flex flex-col">
+        <header
+            class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400">zoom_in</span>
+                    <span class="text-sm font-medium text-slate-500">100%</span>
+                </div>
+                <div class="h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
+                <div class="flex gap-1">
+                    <button onclick="undo()"
+                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-400">
+                        <span class="material-symbols-outlined text-xl">undo</span>
+                    </button>
+                    <button onclick="redo()"
+                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-400">
+                        <span class="material-symbols-outlined text-xl">redo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-400"
+                    onclick="document.documentElement.classList.toggle('dark')">
+                    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                </button>
+                <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-lg">
+                    <span>Exportar</span>
+                    <span class="material-symbols-outlined text-sm">download</span>
+                </button>
+            </div>
+        </header>
+
+        <div
+            class="flex-1 bg-slate-100 dark:bg-slate-950 canvas-grid relative flex items-center justify-center p-12 overflow-auto">
+            <canvas id="canvas" width="1200" height="800"></canvas>
+        </div>
+
+        <footer
+            class="h-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between text-[10px] font-medium text-slate-400 dark:text-slate-500">
+            <div class="flex items-center gap-4">
+                <span id="status">Clic Izq: Mover | Clic Der (Arrastrar): Rotar</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> ENGINE
+                    ACTIVE</span>
+                <span class="text-slate-300 dark:text-slate-700">v7.0.4-stable</span>
+            </div>
+        </footer>
+    </main>
+
+    <div class="fixed bottom-12 right-6 flex flex-col items-end gap-2 pointer-events-none">
+        <div
+            class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-800 text-[11px] font-medium space-y-1">
+            <div class="flex items-center justify-between gap-4">
+                <span class="text-slate-400">Arrastrar</span>
+                <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">M1</kbd>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+                <span class="text-slate-400">Rotar</span>
+                <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">R-Click</kbd>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/inde.js"></script>
+</body>
+
+</html>
